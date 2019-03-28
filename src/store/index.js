@@ -1,7 +1,7 @@
-import React from "react";
-import {createStore, combineReducers} from 'redux';
-import reducers from '../reducers/reducers.js';
+import {createStore} from 'redux';
+import todos from '../reducers/reducers.js';
+
 
 export const store = createStore(
-    reducers
+    todos
 );

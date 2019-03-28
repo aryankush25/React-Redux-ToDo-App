@@ -1,51 +1,63 @@
-import React, { Component } from "react";
+import React from "react";
+import { connect } from "react-redux";
+import { addTodo } from "../actions/actions";
 
-class Form extends Component {
+class Form extends React.Component {
   constructor(props) {
     super(props);
 
     this.initialState = {
-      caption: "",
-      isCompleted: false,
-      isEditable: false
+      caption: ""
     };
-
     this.state = this.initialState;
   }
 
-  handleChange = event => {
-    const { value: caption } = event.target;
-    const isCompleted = false;
-    const isEditable = false;
-
-    this.setState({
-      caption,
-      isCompleted,
-      isEditable
-    });
-  };
-
-  onFormSubmit = event => {
+  handleSubmit = event => {
     event.preventDefault();
-    this.props.handleSubmit(this.state);
+    if (this.state.caption !== "") {
+      this.props.addTodo(this.state.caption);
+    }
     this.setState(this.initialState);
   };
 
-  render() {
-    const { caption } = this.state;
+  handleChange = event => {
+    const { value: caption } = event.target;
 
+    this.setState({
+      caption
+    });
+  };
+
+  showState = () => {
+    console.log(this.props.todos);
+  };
+
+  render() {
     return (
-      <form onSubmit={this.onFormSubmit}>
+      <form onSubmit={this.handleSubmit}>
         <input
           type="text"
-          name="caption"
-          value={caption}
-          placeholder="Enter Caption"
+          placeholder="Enter Text"
           onChange={this.handleChange}
+          value={this.state.caption}
         />
       </form>
     );
   }
 }
 
-export default Form;
+const mapStateToProps = state => {
+  const todos = state;
+  return { todos };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    addTodo: todoName => dispatch(addTodo(todoName))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Form);

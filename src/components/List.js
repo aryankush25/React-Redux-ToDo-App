@@ -1,4 +1,12 @@
-import React, { Component, useState } from "react";
+import React, { useState } from "react";
+import { connect } from "react-redux";
+import {
+  addTodo,
+  toggleTodo,
+  removeTodo,
+  toddleEdit,
+  editTodo
+} from "../actions/actions";
 
 const TableHead = () => {
   return (
@@ -17,7 +25,7 @@ const RenderText = props => {
 
   const onSubmit = event => {
     event.preventDefault();
-    props.editTodo(props.index, changedText);
+    if (changedText !== "") props.editTodo(props.index, changedText);
   };
 
   const onChange = event => {
@@ -41,45 +49,55 @@ const RenderText = props => {
 };
 
 const TableBody = props => {
-  const rows = props.todos.map((row, index) => {
-    const editTodo = index => {
-      if (!row.isEditable && !row.isCompleted) {
-        props.toggleEditable(index);
-      }
-    };
-
-    return (
-      <tr key={index}>
-        <td>
-          <input
-            type="checkbox"
-            onChange={() => props.toggleTodos(index)}
-            checked={row.isCompleted}
-          />
-        </td>
-        <td onDoubleClick={() => editTodo(index)}>
-          <RenderText row={row} editTodo={props.editTodo} index={index} />
-        </td>
-        <td>
-          <button onClick={() => props.removeTodos(index)}>Delete</button>
-        </td>
-      </tr>
-    );
-  });
-
-  return <tbody>{rows}</tbody>;
+  return (
+    <tbody>
+      {props.todos.map((row, index) => {
+        return (
+          <tr key={index}>
+            <td>
+              <input
+                type="checkbox"
+                onChange={() => {
+                  if (!row.isEditable) props.toggleTodo(index);
+                }}
+                checked={row.isCompleted}
+              />
+            </td>
+            <td
+              onDoubleClick={() => {
+                if (!row.isCompleted && !row.isEditable) {
+                  props.toddleEdit(index);
+                }
+              }}
+            >
+              <div
+                className={
+                  row.isCompleted && !row.isEditable ? "line-through" : ""
+                }
+              >
+                <RenderText row={row} editTodo={props.editTodo} index={index} />
+              </div>
+            </td>
+            <td>
+              <button onClick={() => props.removeTodo(index)}>Delete</button>
+            </td>
+          </tr>
+        );
+      })}
+    </tbody>
+  );
 };
 
-class List extends Component {
+class List extends React.Component {
   render() {
     return (
       <table>
         <TableHead />
         <TableBody
           todos={this.props.todos}
-          removeTodos={this.props.removeTodos}
-          toggleTodos={this.props.toggleTodos}
-          toggleEditable={this.props.toggleEditable}
+          toggleTodo={this.props.toggleTodo}
+          removeTodo={this.props.removeTodo}
+          toddleEdit={this.props.toddleEdit}
           editTodo={this.props.editTodo}
         />
       </table>
@@ -87,4 +105,23 @@ class List extends Component {
   }
 }
 
-export default List;
+const mapStateToProps = state => {
+  const todos = state;
+  return { todos };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    addTodo: todoName => dispatch(addTodo(todoName)),
+    toggleTodo: todoIndex => dispatch(toggleTodo(todoIndex)),
+    removeTodo: todoIndex => dispatch(removeTodo(todoIndex)),
+    toddleEdit: toddleIndex => dispatch(toddleEdit(toddleIndex)),
+    editTodo: (todoIndex, todoCaption) =>
+      dispatch(editTodo(todoIndex, todoCaption))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(List);
