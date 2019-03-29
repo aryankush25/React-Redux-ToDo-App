@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import {
   addTodo,
@@ -22,6 +22,10 @@ const TableHead = () => {
 
 const RenderText = props => {
   var [changedText, updateChangeText] = useState(props.row.caption);
+  useEffect(() => {
+    console.log("dasdas", props.row.caption);
+    updateChangeText(props.row.caption);
+  }, [props.row.caption]);
 
   const onSubmit = event => {
     event.preventDefault();
