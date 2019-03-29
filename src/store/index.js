@@ -1,7 +1,4 @@
-import {createStore} from 'redux';
-import todos from '../reducers/reducers.js';
+import { createStore } from "redux";
+import todos from "../reducers/reducers.js";
 
-
-export const store = createStore(
-    todos
-);
+export const store = createStore(todos);
